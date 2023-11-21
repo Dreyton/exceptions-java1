@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 
+import model.exceptions.ReservationException;
+
 public class Reservation {
 	private Integer roomNumber;
 	private LocalDate checkin;
@@ -13,7 +15,9 @@ public class Reservation {
 
 	}
 
-	public Reservation(Integer roomNumber, LocalDate checkin, LocalDate checkout) {
+	public Reservation(Integer roomNumber, LocalDate checkin, LocalDate checkout) throws ReservationException {
+		if (!checkout.isAfter(checkin))
+			throw new ReservationException("Error in reservation: Check-out date must be after check-in date");
 		this.roomNumber = roomNumber;
 		this.checkin = checkin;
 		this.checkout = checkout;
@@ -35,16 +39,17 @@ public class Reservation {
 		return checkout;
 	}
 
-	public String updateDates(LocalDate checkin, LocalDate checkout) {
+	public void updateDates(LocalDate checkin, LocalDate checkout) throws ReservationException {
 		LocalDate now = LocalDate.now();// hoje
 
 		if (checkin.isBefore(now) || checkout.isBefore(now))
-			return "Error in reservation: Reservation dates for update must be future dates";
+			throw new ReservationException(
+					"Error in reservation: Reservation dates for update must be future dates");
 		if (!checkout.isAfter(checkin))
-			return "Error in reservation: Check-out date must be after check-in date";
+			throw new ReservationException("Error in reservation: Check-out date must be after check-in date");
 		this.checkin = checkin;
 		this.checkout = checkout;
-		return null;
+
 	}
 
 	public int duration() {
